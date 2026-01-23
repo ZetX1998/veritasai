@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platba – VeritasAI</title>
+  <style>
+    body {
+      background:#0b0b0b;
+      color:#fff;
+      font-family:system-ui;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+    .box {
+      max-width:400px;
+      text-align:center;
+    }
+    button {
+      width:100%;
+      padding:15px;
+      font-size:16px;
+      background:#fff;
+      color:#000;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+    }
+    p { opacity:0.7; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Platba</h2>
+    <p>
+      Testovací režim.  
+      Zde bude GoPay / karta.
+    </p>
+    <button onclick="pay()">Simulovat zaplacení</button>
+  </div>
+
+  <script>
+    function pay() {
+      window.location.href = "/result.html";
+    }
+  </script>
+</body>
+</html>
