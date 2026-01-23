@@ -2,141 +2,17 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VeritasAI – Upřímná pravda o tvém nápadu</title>
-  <meta name="description" content="Anonymní AI, která ti bez obalu řekne pravdu. Žádná motivace, žádné kecy. Jen realita.">
-  <style>
-    body {
-      margin: 0;
-      background: #0b0b0b;
-      color: #f2f2f2;
-      font-family: system-ui, sans-serif;
-    }
-    .wrap {
-      max-width: 700px;
-      margin: auto;
-      padding: 30px 20px;
-    }
-    h1 { font-size: 32px; }
-    p { opacity: 0.85; }
-
-    label {
-      display: block;
-      margin-top: 25px;
-      font-weight: 600;
-    }
-    textarea, input {
-      width: 100%;
-      background: #111;
-      border: 1px solid #222;
-      color: #fff;
-      padding: 14px;
-      margin-top: 8px;
-      border-radius: 6px;
-      font-size: 15px;
-    }
-    textarea { min-height: 120px; }
-
-    .note {
-      font-size: 13px;
-      opacity: 0.6;
-      margin-top: 5px;
-    }
-
-    .levels {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-    .level {
-      flex: 1;
-      border: 1px solid #333;
-      padding: 15px;
-      cursor: pointer;
-      border-radius: 6px;
-      text-align: center;
-    }
-    .level:hover { background: #141414; }
-
-    button {
-      width: 100%;
-      margin-top: 30px;
-      padding: 16px;
-      background: #fff;
-      color: #000;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .disclaimer {
-      font-size: 12px;
-      opacity: 0.5;
-      margin-top: 25px;
-      line-height: 1.5;
-    }
-  </style>
+  <title>Anonymní AI Verdikt</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+<body class="dark">
 
-<body>
-  <div class="wrap">
-    <h1>VeritasAI</h1>
-    <p>
-      Anonymní a inovativní AI, která ti řekne pravdu o tvém nápadu.  
-      Bez motivace. Bez lží. Bez cenzury a výmyslů. jen tvrdá pravda. 
-    </p>
+<h1>Anonymní AI verdikt</h1>
 
-    <label>Jaký je tvůj cíl?</label>
-    <textarea placeholder="Buď konkrétní. Čím víc detailů, tím přesnější odpověď."></textarea>
+<form action="pay.html">
+  <textarea placeholder="Popiš situaci co nejkonkrétněji..." required></textarea>
+  <button type="submit">Pokračovat</button>
+</form>
 
-    <label>Co sis vymyslel / vymyslela?</label>
-    <textarea placeholder="Popiš nápad tak, jako bys ho vysvětloval cizímu člověku."></textarea>
-
-    <label>Co tě nejvíc brzdí?</label>
-    <textarea placeholder="Strach, peníze, disciplína, znalosti, čas?"></textarea>
-
-    <label>Email (nepovinné)</label>
-    <input type="email" placeholder="Pouze pokud chceš zaslat odpověď">
-
-    <p class="note">
-      Nic se neukládá. Bez cookies. Bez IP logů a jinych údajů.
-    </p>
-
-    <div class="levels">
-      <div class="level">Jemná realita<br><strong>50 Kč</strong></div>
-      <div class="level">Tvrdá pravda<br><strong>90 Kč</strong></div>
-      <div class="level">Brutální verdikt<br><strong>110 Kč</strong></div>
-    </div>
-
-    <button>Přejít k platbě</button>
-
-    <div class="disclaimer">
-      Nejedná se o psychologické, právní ani finanční poradenství.  
-      Odpovědi jsou generovány výhradně z vašich vstupů.  
-      Neseme nulovou odpovědnost za interpretaci odpovědí.
-    </div>
-  </div>
-  <script>
-let selectedPrice = null;
-
-document.querySelectorAll('.level').forEach(level => {
-  level.addEventListener('click', () => {
-    document.querySelectorAll('.level').forEach(l => l.style.borderColor = '#333');
-    level.style.borderColor = '#fff';
-    selectedPrice = level.innerText;
-  });
-});
-
-document.querySelector('button').addEventListener('click', () => {
-  if (!selectedPrice) {
-    alert('Vyber úroveň pravdy.');
-    return;
-  }
-  window.location.href = '/pay.html';
-});
-  </script>
-  
 </body>
 </html>
