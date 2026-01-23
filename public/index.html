@@ -118,5 +118,25 @@
       Neseme nulovou odpovědnost za interpretaci odpovědí.
     </div>
   </div>
+  <script>
+let selectedPrice = null;
+
+document.querySelectorAll('.level').forEach(level => {
+  level.addEventListener('click', () => {
+    document.querySelectorAll('.level').forEach(l => l.style.borderColor = '#333');
+    level.style.borderColor = '#fff';
+    selectedPrice = level.innerText;
+  });
+});
+
+document.querySelector('button').addEventListener('click', () => {
+  if (!selectedPrice) {
+    alert('Vyber úroveň pravdy.');
+    return;
+  }
+  window.location.href = '/pay.html';
+});
+  </script>
+  
 </body>
 </html>
