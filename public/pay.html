@@ -2,78 +2,36 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Platba</title>
-
-  <style>
-    body {
-      background: #0b0b0b;
-      color: #fff;
-      font-family: system-ui;
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .box {
-      max-width: 420px;
-      margin: 0 auto;
-      background: #111;
-      padding: 30px;
-      border-radius: 12px;
-    }
-
-    h2 {
-      margin-bottom: 10px;
-    }
-
-    .price {
-      font-size: 22px;
-      margin: 20px 0;
-      font-weight: bold;
-    }
-
-    button {
-      width: 100%;
-      padding: 15px;
-      margin-top: 15px;
-      background: #fff;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+<body class="dark">
 
-<body>
+<h2>Vyber úroveň odpovědi</h2>
 
-  <div class="box">
-    <h2>Pokračovat k platbě</h2>
-    <p>Vybral sis úroveň odpovědi.</p>
+<button onclick="pay(50)">Základní – 50 Kč</button>
+<button onclick="pay(90)">Upřímná – 90 Kč</button>
+<button onclick="pay(110)">Brutální – 110 Kč</button>
 
-    <div class="price" id="price">Načítám…</div>
-
-    <button onclick="goToQR()">Zaplatit převodem</button>
-  </div>
-
-  <script>
-    // cena přišla z index.html
-    const params = new URLSearchParams(window.location.search);
-    const price = Number(params.get("price"));
-
-    if (!price) {
-      document.body.innerHTML = "<p>Chybí cena.</p>";
-      throw new Error("Missing price");
+<script>
+function pay(amount) {
+  fetch("/create-qr", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.error) {
+      alert(data.error);
+      return;
     }
-
-    document.getElementById("price").innerText =
-      "Cena: " + price + " Kč";
-
-    function goToQR() {
-      window.location.href = "/qr.html?price=" + price;
-    }
-  </script>
+    window.location.href =
+      `/qr.html?vs=${data.vs}&amount=${data.amount}&spd=${encodeURIComponent(data.spd)}`;
+  })
+  .catch(() => alert("Chyba serveru"));
+}
+</script>
 
 </body>
 </html>
