@@ -8,23 +8,19 @@ app.use(express.json());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/* =========================
-   STATICKÉ SOUBORY
-========================= */
+/* =======================
+   STATICKÝ WEB
+======================= */
 app.use(express.static(path.join(__dirname, "public")));
 
-/* =========================
-   CESTA K DATABÁZI PLATEB
-========================= */
+/* =======================
+   PLATBY
+======================= */
 const PAYMENTS_FILE = path.join(__dirname, "data", "payments.json");
 
-/* =========================
-   POMOCNÉ FUNKCE
-========================= */
 function loadPayments() {
   if (!fs.existsSync(PAYMENTS_FILE)) {
     fs.writeFileSync(PAYMENTS_FILE, "[]");
-    return [];
   }
   return JSON.parse(fs.readFileSync(PAYMENTS_FILE, "utf8"));
 }
@@ -37,9 +33,9 @@ function generateVS() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-/* =========================
-   CREATE QR PLATBU
-========================= */
+/* =======================
+   CREATE QR
+======================= */
 app.post("/create-qr", (req, res) => {
   const { amount } = req.body;
 
@@ -50,7 +46,7 @@ app.post("/create-qr", (req, res) => {
   const vs = generateVS();
 
   const payment = {
-    vs: vs,
+    vs,
     amount: Number(amount),
     status: "waiting",
     created: new Date().toISOString()
@@ -60,31 +56,25 @@ app.post("/create-qr", (req, res) => {
   payments.push(payment);
   savePayments(payments);
 
-  /* 🔴 ZMĚŇ NA SVŮJ ÚČET */
-  const account = "CZ3730300000002906469015";
+  const account = "CZ6508000000001234567899"; // ⬅️ ZMĚŇ NA SVŮJ
   const message = "AnonymniAI";
 
   const spd = `SPD*1.0*ACC:${account}*AM:${amount}*CC:CZK*MSG:${message}*X-VS:${vs}`;
 
-  res.json({
-    vs: vs,
-    amount: amount,
-    spd: spd
-  });
+  res.json({ vs, amount, spd });
 });
 
-/* =========================
+/* =======================
    FALLBACK
-========================= */
+======================= */
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-/* =========================
-   START SERVERU
-========================= */
+/* =======================
+   START
+======================= */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Server běží na portu ${PORT}`);
+  console.log("✅ Server běží na portu", PORT);
 });
-
