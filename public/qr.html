@@ -2,161 +2,26 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR platba</title>
-
-  <style>
-    body {
-      background: #0b0b0b;
-      color: #ffffff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .box {
-      max-width: 420px;
-      margin: 0 auto;
-      background: #111;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.6);
-    }
-
-    h2 {
-      margin-bottom: 10px;
-    }
-
-    p {
-      opacity: 0.8;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    #amount {
-      font-size: 22px;
-      margin: 15px 0;
-      font-weight: bold;
-    }
-
-    img {
-      margin: 20px auto;
-      display: block;
-    }
-
-    button {
-      width: 100%;
-      padding: 15px;
-      margin-top: 15px;
-      background: #ffffff;
-      color: #000000;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .hint {
-      margin-top: 15px;
-      font-size: 12px;
-      opacity: 0.6;
-    }
-  </style>
+  <title>QR Platba</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+<body class="dark">
 
-<body>
+<h2>QR platba</h2>
 
-  <div class="box">
-    <h2>Zaplať pomocí QR kódu</h2>
+<p>Částka: <strong id="amount"></strong> Kč</p>
+<p>VS: <strong id="vs"></strong></p>
 
-    <p>
-      Otevři mobilní banku, naskenuj QR kód  
-      a odešli platbu v přesné částce.
-    </p>
+<img id="qr">
 
-    <div id="amount">Načítám částku…</div>
+<script>
+const p = new URLSearchParams(window.location.search);
+document.getElementById("amount").innerText = p.get("amount");
+document.getElementById("vs").innerText = p.get("vs");
 
-    <img id="qr" alt="QR kód pro platbu" />
-
-    <button id="paidBtn" onclick="confirmPaid()" disabled>
-      Zaplatil jsem
-    </button>
-
-    <div class="hint">
-      Platba je jednorázová.  
-      Data se neukládají.
-    </div>
-  </div>
-
-  <script>
-    // 1️⃣ načteme cenu z URL (např. ?price=50)
-    const params = new URLSearchParams(window.location.search);
-    const basePrice = Number(params.get("price"));
-
-    if (!basePrice) {
-      document.body.innerHTML = "<p>Chybí cena platby.</p>";
-      throw new Error("Missing price");
-    }
-
-    let paymentId = null;
-
-    // 2️⃣ požádáme server o QR platbu
-    fetch("/create-qr", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        baseAmount: basePrice
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      paymentId = data.paymentId;
-
-      document.getElementById("amount").innerText =
-        "Částka k úhradě: " + data.amount + " Kč";
-
-      document.getElementById("qr").src =
-        "https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=" +
-        encodeURIComponent(data.spd);
-
-      document.getElementById("paidBtn").disabled = false;
-    })
-    .catch(err => {
-      document.getElementById("amount").innerText =
-        "Chyba při generování platby.";
-      console.error(err);
-    });
-
-    // 3️⃣ uživatel klikne „Zaplatil jsem“
-    function confirmPaid() {
-      if (!paymentId) return;
-
-      fetch("/confirm-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          paymentId: paymentId
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          window.location.href = "/result.html";
-        } else {
-          alert("Platba zatím nebyla potvrzena.");
-        }
-      });
-    }
-  </script>
+document.getElementById("qr").src =
+  "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + p.get("spd");
+</script>
 
 </body>
 </html>
