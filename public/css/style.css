@@ -1,1 +1,18 @@
+body.dark {
+  background: #0f0f0f;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  padding: 40px;
+}
+
+button {
+  padding: 12px 20px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+}
 
