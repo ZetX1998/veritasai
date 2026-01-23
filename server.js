@@ -1,35 +1,90 @@
+import express from "express";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const app = express();
+app.use(express.json());
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/* =========================
+   STATICKÉ SOUBORY
+========================= */
+app.use(express.static(path.join(__dirname, "public")));
+
+/* =========================
+   CESTA K DATABÁZI PLATEB
+========================= */
+const PAYMENTS_FILE = path.join(__dirname, "data", "payments.json");
+
+/* =========================
+   POMOCNÉ FUNKCE
+========================= */
+function loadPayments() {
+  if (!fs.existsSync(PAYMENTS_FILE)) {
+    fs.writeFileSync(PAYMENTS_FILE, "[]");
+    return [];
+  }
+  return JSON.parse(fs.readFileSync(PAYMENTS_FILE, "utf8"));
+}
+
+function savePayments(data) {
+  fs.writeFileSync(PAYMENTS_FILE, JSON.stringify(data, null, 2));
+}
+
+function generateVS() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+/* =========================
+   CREATE QR PLATBU
+========================= */
 app.post("/create-qr", (req, res) => {
-  const { baseAmount } = req.body;
+  const { amount } = req.body;
 
-  const randomCents = Math.floor(Math.random() * 90 + 10);
-  const finalAmount = (baseAmount + randomCents / 100).toFixed(2);
-
-  const paymentId = Date.now().toString();
-
-  pendingPayments[paymentId] = {
-    amount: finalAmount,
-    paid: false
-  };
-  
-  const account = "CZ37 30300000002906469015"; // TVŮJ ÚČET
-  const message = "VeritasAI";
-
-  const spd = `SPD*1.0*ACC:${account}*AM:${finalAmount}*CC:CZK*MSG:${message}`;
-
-  res.json({
-    paymentId,
-    amount: finalAmount,
-    spd
-  });
-});
-app.post("/confirm-payment", (req, res) => {
-  const { paymentId } = req.body;
-
-  if (!pendingPayments[paymentId]) {
-    return res.json({ success: false });
+  if (![50, 90, 110].includes(Number(amount))) {
+    return res.status(400).json({ error: "Neplatná částka" });
   }
 
-  pendingPayments[paymentId].paid = true;
+  const vs = generateVS();
 
-  res.json({ success: true });
+  const payment = {
+    vs: vs,
+    amount: Number(amount),
+    status: "waiting",
+    created: new Date().toISOString()
+  };
+
+  const payments = loadPayments();
+  payments.push(payment);
+  savePayments(payments);
+
+  /* 🔴 ZMĚŇ NA SVŮJ ÚČET */
+  const account = "CZ3730300000002906469015";
+  const message = "AnonymniAI";
+
+  const spd = `SPD*1.0*ACC:${account}*AM:${amount}*CC:CZK*MSG:${message}*X-VS:${vs}`;
+
+  res.json({
+    vs: vs,
+    amount: amount,
+    spd: spd
+  });
 });
+
+/* =========================
+   FALLBACK
+========================= */
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+/* =========================
+   START SERVERU
+========================= */
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server běží na portu ${PORT}`);
+});
+
