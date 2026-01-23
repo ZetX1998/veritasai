@@ -1,1 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>QR platba</title>
+<style>
+body {
+  background:#0b0b0b;
+  color:#fff;
+  font-family:system-ui;
+  text-align:center;
+  padding:40px;
+}
+img {
+  margin:20px auto;
+}
+button {
+  padding:15px;
+  width:100%;
+  max-width:300px;
+  background:#fff;
+  color:#000;
+  border:none;
+  border-radius:6px;
+}
+</style>
+</head>
+<body>
+
+<h2>Zaplať QR kódem</h2>
+<p id="amount"></p>
+<img id="qr" />
+
+<p>Po zaplacení klikni:</p>
+<button onclick="paid()">Zaplatil jsem</button>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const base = Number(params.get("price"));
+
+fetch("/create-qr", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ baseAmount: base })
+})
+.then(res => res.json())
+.then(data => {
+  document.getElementById("amount").innerText =
+    "Částka: " + data.amount + " Kč";
+
+  document.getElementById("qr").src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" +
+    encodeURIComponent(data.spd);
+
+  sessionStorage.setItem("expectedAmount", data.amount);
+});
+
+function paid() {
+  window.location.href = "/result.html";
+}
+</script>
+
+</body>
+</html>
 
