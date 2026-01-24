@@ -1,89 +1,39 @@
-import express from "express";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+// middleware
 app.use(express.json());
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-/* =======================
-   STATICKÝ WEB
-======================= */
+// statické složky
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/admin", express.static(path.join(__dirname, "admin")));
 
-/* =======================
-   PLATBY
-======================= */
+// cesta k datům
 const PAYMENTS_FILE = path.join(__dirname, "data", "payments.json");
 
-function loadPayments() {
-  if (!fs.existsSync(PAYMENTS_FILE)) {
-    fs.writeFileSync(PAYMENTS_FILE, "[]");
-  }
-  return JSON.parse(fs.readFileSync(PAYMENTS_FILE, "utf8"));
+// jistota, že soubor existuje
+if (!fs.existsSync(PAYMENTS_FILE)) {
+  fs.writeFileSync(PAYMENTS_FILE, "[]");
 }
 
-function savePayments(data) {
-  fs.writeFileSync(PAYMENTS_FILE, JSON.stringify(data, null, 2));
-}
+// ===== API =====
 
-function generateVS() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-/* =======================
-   CREATE QR
-======================= */
-app.post("/create-qr", (req, res) => {
-  const { amount } = req.body;
-
-  if (![50, 90, 110].includes(Number(amount))) {
-    return res.status(400).json({ error: "Neplatná částka" });
-  }
-
-  const vs = generateVS();
-
-  const payment = {
-    vs,
-    amount: Number(amount),
-    status: "waiting",
-    created: new Date().toISOString()
-  };
-
-  const payments = loadPayments();
-  payments.push(payment);
-  savePayments(payments);
-
-  const account = "CZ6508000000001234567899"; // ⬅️ ZMĚŇ NA SVŮJ
-  const message = "AnonymniAI";
-
-  const spd = `SPD*1.0*ACC:${account}*AM:${amount}*CC:CZK*MSG:${message}*X-VS:${vs}`;
-
-  res.json({ vs, amount, spd });
-});
-
-/* =======================
-   FALLBACK
-======================= */
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/index.html"));
-});
-
-
+// vytvoření platby
 app.post("/create-payment", (req, res) => {
   const { amount } = req.body;
 
-  if (!amount || amount <= 0) {
-    return res.status(400).json({ error: "Neplatná částka" });
+  if (!amount) {
+    return res.status(400).json({ error: "Chybí částka" });
   }
 
   const payments = JSON.parse(fs.readFileSync(PAYMENTS_FILE));
-
   const payment = {
-    id: "PAY-" + Date.now(),
-    amount: Number(amount),
+    id: Date.now().toString(),
+    amount,
     status: "pending",
     createdAt: new Date().toISOString()
   };
@@ -94,10 +44,13 @@ app.post("/create-payment", (req, res) => {
   res.json(payment);
 });
 
-/* =======================
-   START
-======================= */
-const PORT = process.env.PORT || 3000;
+// admin – seznam plateb
+app.get("/api/payments", (req, res) => {
+  const payments = JSON.parse(fs.readFileSync(PAYMENTS_FILE));
+  res.json(payments);
+});
+
+// ===== START =====
 app.listen(PORT, () => {
-  console.log("✅ Server běží na portu", PORT);
+  console.log("Server běží na portu", PORT);
 });
