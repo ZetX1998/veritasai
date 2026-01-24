@@ -8,9 +8,10 @@ const PORT = process.env.PORT || 3000;
 // middleware
 app.use(express.json());
 
-// statické složky
-app.use(express.static(path.join(__dirname, "public")));
+// statické složky – POŘADÍ JE DŮLEŽITÉ
 app.use("/admin", express.static(path.join(__dirname, "admin")));
+app.use(express.static(path.join(__dirname, "public")));
+
 
 // cesta k datům
 const PAYMENTS_FILE = path.join(__dirname, "data", "payments.json");
