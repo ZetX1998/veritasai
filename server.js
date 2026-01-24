@@ -71,6 +71,29 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
+
+app.post("/create-payment", (req, res) => {
+  const { amount } = req.body;
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ error: "Neplatná částka" });
+  }
+
+  const payments = JSON.parse(fs.readFileSync(PAYMENTS_FILE));
+
+  const payment = {
+    id: "PAY-" + Date.now(),
+    amount: Number(amount),
+    status: "pending",
+    createdAt: new Date().toISOString()
+  };
+
+  payments.push(payment);
+  fs.writeFileSync(PAYMENTS_FILE, JSON.stringify(payments, null, 2));
+
+  res.json(payment);
+});
+
 /* =======================
    START
 ======================= */
