@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <title>QR Platba</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <title>QR platba</title>
 </head>
-<body class="dark">
+<body>
+  <h2>Zaplaťte pomocí QR kódu</h2>
 
-<h2>QR platba</h2>
+  <p>Částka: <strong id="amount"></strong> Kč</p>
+  <p>ID platby: <strong id="pid"></strong></p>
 
-<p>Částka: <strong id="amount"></strong> Kč</p>
-<p>VS: <strong id="vs"></strong></p>
+  <img id="qr" />
 
-<img id="qr">
+  <script>
+    const params = new URLSearchParams(location.search);
+    const amount = params.get("amount");
+    const id = params.get("id");
 
-<script>
-const p = new URLSearchParams(window.location.search);
-document.getElementById("amount").innerText = p.get("amount");
-document.getElementById("vs").innerText = p.get("vs");
+    document.getElementById("amount").innerText = amount;
+    document.getElementById("pid").innerText = id;
 
-document.getElementById("qr").src =
-  "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + p.get("spd");
-</script>
+    const qrData = `SPD*1.0*ACC:CZ1234567890/0100*AM:${amount}*CC:CZK*MSG:${id}`;
 
+    document.getElementById("qr").src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+      encodeURIComponent(qrData);
+  </script>
 </body>
 </html>
