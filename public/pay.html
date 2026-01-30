@@ -9,16 +9,23 @@
 
 <h2>Vyber úroveň odpovědi</h2>
 
-<button onclick="pay(50)">Základní – 50 Kč</button>
-<button onclick="pay(90)">Upřímná – 90 Kč</button>
-<button onclick="pay(110)">Brutální – 110 Kč</button>
+<button onclick="pay(50, 'jemna')">Jemná – 50 Kč</button>
+<button onclick="pay(90, 'stredni')">Střední – 90 Kč</button>
+<button onclick="pay(110, 'drasticka')">Drastičtější – 110 Kč</button>
 
+<script src="js/app.js"></script>  <!-- Přidáno pro společný JS -->
 <script>
-function pay(amount) {
-  fetch("/create-qr", {
+function pay(amount, level) {
+  const userInput = localStorage.getItem("userInput");  // Načteno z index
+  if (!userInput) {
+    alert("Nejdřív popiš situaci na hlavní stránce.");
+    return;
+  }
+
+  fetch("/create-payment", {  // Opraveno na správnou routu
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount })
+    body: JSON.stringify({ amount, userInput, level })  // Přidáno input a level
   })
   .then(res => res.json())
   .then(data => {
@@ -26,8 +33,7 @@ function pay(amount) {
       alert(data.error);
       return;
     }
-    window.location.href =
-      `/qr.html?vs=${data.vs}&amount=${data.amount}&spd=${encodeURIComponent(data.spd)}`;
+    window.location.href = `/qr.html?amount=\( {data.amount}&id= \){data.id}`;
   })
   .catch(() => alert("Chyba serveru"));
 }
