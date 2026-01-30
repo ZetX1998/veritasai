@@ -9,10 +9,22 @@
 
 <h1>Anonymní AI verdikt</h1>
 
-<form action="pay.html">
-  <textarea placeholder="Popiš situaci co nejkonkrétněji..." required></textarea>
+<p><small>Disclaimer: Toto není profesionální rada, jen upřímný pohled propracované AI. Nemusíte mít strach, že by se vaše data někam dostali,jsme zcela anonymní, žádné ukládání dat ani plateb.</small></p>  <!-- Přidáno -->
+
+<form id="inputForm">
+  <textarea id="userInput" placeholder="Popiš situaci co nejkonkrétněji..." required></textarea>
   <button type="submit">Pokračovat</button>
 </form>
+
+<script src="js/app.js"></script>  <!-- Přidáno pro společný JS -->
+<script>
+  document.getElementById("inputForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = document.getElementById("userInput").value;
+    localStorage.setItem("userInput", input);  // Dočasné uložení (anonymní)
+    window.location.href = "pay.html";
+  });
+</script>
 
 </body>
 </html>
