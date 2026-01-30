@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -36,7 +35,7 @@
       font-weight: bold;
     }
 
-    .paid {
+    .paid, .completed {
       color: #4caf50;
       font-weight: bold;
     }
@@ -87,10 +86,12 @@
         div.innerHTML = `
           <div class="row"><strong>ID:</strong> ${p.id}</div>
           <div class="row"><strong>Částka:</strong> ${p.amount} Kč</div>
+          <div class="row"><strong>Level:</strong> ${p.level || 'N/A'}</div>  <!-- Přidáno -->
           <div class="row"><strong>Stav:</strong>
-            <span class="${p.status}">${p.status}</span>
+            <span class="\( {p.status}"> \){p.status}</span>
           </div>
           <div class="row"><small>${new Date(p.createdAt).toLocaleString()}</small></div>
+          <div class="row"><strong>Response:</strong> ${p.response ? p.response.substring(0, 100) + '...' : 'Žádná'}</div>  <!-- Přidáno -->
         `;
 
         container.appendChild(div);
