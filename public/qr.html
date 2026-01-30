@@ -3,24 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <title>QR platba</title>
+  <link rel="stylesheet" href="css/style.css">  <!-- Přidáno pro design -->
 </head>
-<body>
+<body class="dark">
   <h2>Zaplaťte pomocí QR kódu</h2>
 
   <p>Částka: <strong id="amount"></strong> Kč</p>
   <p>ID platby: <strong id="pid"></strong></p>
-
   <img id="qr" />
+
+  <p>Platba bude automaticky ověřena do 2 minut. Poté jděte na <a href="/result.html?id=" id="result-link"></a></p>
 
   <script>
     const params = new URLSearchParams(location.search);
     const amount = params.get("amount");
     const id = params.get("id");
 
-    document.getElementById("amount").innerText = amount;
-    document.getElementById("pid").innerText = id;
+    document.getElementById("amount").innerText = amount || "N/A";
+    document.getElementById("pid").innerText = id || "N/A";
+    document.getElementById("result-link").href = `/result.html?id=${id}`;
+    document.getElementById("result-link").innerText = `result.html?id=${id}`;
 
-    const qrData = `SPD*1.0*ACC:CZ1234567890/0100*AM:${amount}*CC:CZK*MSG:${id}`;
+    // Nahraď svým skutečným účtem (IBAN/BIC)
+    const qrData = `SPD*1.0*ACC:CZxxxyyyzzzz/xxxx*AM:\( {amount}*CC:CZK*MSG: \){id}`;  // ZMĚŇ ÚČET!
 
     document.getElementById("qr").src =
       "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
