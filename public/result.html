@@ -3,8 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>Výsledek</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dark">
-<h2>Čeká se na schválení platby</h2>
+<h2>Tvá upřímná odpověď</h2>
+<div id="response">Načítám...</div>
+
+<script src="js/app.js"></script>  <!-- Přidáno pro společný JS -->
+<script>
+  const params = new URLSearchParams(location.search);
+  const id = params.get("id");
+
+  if (!id) {
+    document.getElementById("response").innerHTML = "<p>Chybí ID platby.</p>";
+  } else {
+    fetch(`/api/response/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById("response").innerHTML = `<p>${data.error}</p>`;
+        } else {
+          document.getElementById("response").innerHTML = `<p>${data.response}</p>`;
+          // Smaž localStorage po
+          localStorage.removeItem("userInput");
+        }
+      })
+      .catch(() => {
+        document.getElementById("response").innerHTML = "<p>Chyba načítání odpovědi.</p>";
+      });
+  }
+</script>
 </body>
 </html>
