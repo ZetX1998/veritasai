@@ -11,5 +11,6 @@
     "basic-auth": "^2.0.1",  // Přidáno pro bezpečnost adminu
     "node-cron": "^3.0.3",   // Přidáno pro automatizaci checku plateb
     "openai": "^4.57.3"      // Přidáno pro AI integraci
+    "dotenv": "^16.4.5"
   }
 }
