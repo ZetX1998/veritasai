@@ -7,6 +7,9 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "basic-auth": "^2.0.1",  // Přidáno pro bezpečnost adminu
+    "node-cron": "^3.0.3",   // Přidáno pro automatizaci checku plateb
+    "openai": "^4.57.3"      // Přidáno pro AI integraci
   }
 }
