@@ -11,6 +11,6 @@
     "basic-auth": "^2.0.1",
     "node-cron": "^3.0.3",
     "openai": "^4.57.3",
-    "dotenv": "^16.4.5"  // Bez comma na konci
+    "dotenv": "^16.4.5"
   }
 }
