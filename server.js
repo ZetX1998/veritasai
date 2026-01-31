@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Nahraď svým OpenAI API klíčem (získáš na openai.com)
-const openai = new OpenAI({ apiKey: "sk-tvoj-openai-api-key-zde" });  // ZMĚŇ!
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Middleware
 app.use(express.json());
