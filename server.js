@@ -1,4 +1,6 @@
 require('dotenv').config();
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const ADMIN_PASS = process.env.ADMIN_PASS;
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
