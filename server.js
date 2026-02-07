@@ -34,7 +34,7 @@ if (!fs.existsSync(PAYMENTS_FILE)) {
 
 // Basic auth pro admin (uživatel: admin, heslo: tajneheslo – změň!)
 const ADMIN_USER = "admin";
-const ADMIN_PASS = "tajneheslo";  // ZMĚŇ NA SILNÉ HESLO!
+const ADMIN_PASS = process.env.ADMIN_PASS;
 
 function authMiddleware(req, res, next) {
   const user = basicAuth(req);
