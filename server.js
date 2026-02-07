@@ -1,5 +1,5 @@
 require('dotenv').config();
-const ADMIN_PASS = process.env.ADMIN_PASS;
+
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
@@ -10,17 +10,13 @@ const OpenAI = require("openai");         // Přidáno pro AI
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Nahraď svým OpenAI API klíčem (získáš na openai.com)
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Middleware
 app.use(express.json());
 
-// Statické složky (pořadí je důležité)
 app.use("/admin", express.static(path.join(__dirname, "admin")));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Data
 const DATA_DIR = path.join(__dirname, "data");
 const PAYMENTS_FILE = path.join(DATA_DIR, "payments.json");
 
@@ -32,9 +28,8 @@ if (!fs.existsSync(PAYMENTS_FILE)) {
   fs.writeFileSync(PAYMENTS_FILE, "[]");
 }
 
-// Basic auth pro admin (uživatel: admin, heslo: tajneheslo – změň!)
 const ADMIN_USER = "admin";
-const ADMIN_PASS = process.env.ADMIN_PASS;
+const ADMIN_PASS = process.env.ADMIN_PASS;  // Pouze jedna deklarace – zde
 
 function authMiddleware(req, res, next) {
   const user = basicAuth(req);
@@ -45,13 +40,11 @@ function authMiddleware(req, res, next) {
   return res.status(401).send("Přístup zamítnut. Zadej heslo.");
 }
 
-// Použij auth na admin routy
 app.use("/admin", authMiddleware);
 app.use("/api/payments", authMiddleware);
 
-// API: Vytvoření platby (přidáno userInput a level)
 app.post("/create-payment", (req, res) => {
-  const { amount, userInput, level } = req.body;  // Přidáno input a level
+  const { amount, userInput, level } = req.body;  
 
   if (!amount || !userInput || !level) {
     return res.status(400).json({ error: "Chybí částka, input nebo level" });
@@ -67,11 +60,11 @@ app.post("/create-payment", (req, res) => {
   const payment = {
     id: Date.now().toString(),
     amount: Number(amount),
-    userInput,  // Přidáno
-    level,      // Přidáno ('jemna', 'stredni', 'drasticka')
+    userInput,  
+    level,      
     status: "pending",
-    createdAt: Date.now(),  // Změněno na timestamp pro cron
-    response: null  // Přidáno pro AI výstup
+    createdAt: Date.now(),  
+    response: null  
   };
 
   payments.push(payment);
@@ -85,7 +78,6 @@ app.post("/create-payment", (req, res) => {
   res.json(payment);
 });
 
-// Admin – seznam plateb (bez změn, ale s auth)
 app.get("/api/payments", (req, res) => {
   let payments;
   try {
@@ -96,7 +88,6 @@ app.get("/api/payments", (req, res) => {
   }
 });
 
-// Nová routa pro result: Načte response podle ID a smaže payment (anonymita)
 app.get("/api/response/:id", (req, res) => {
   const { id } = req.params;
   let payments;
@@ -113,18 +104,15 @@ app.get("/api/response/:id", (req, res) => {
 
   const response = payments[index].response;
 
-  // Smaž payment po doručení (anonymita)
   payments.splice(index, 1);
   try {
     fs.writeFileSync(PAYMENTS_FILE, JSON.stringify(payments, null, 2));
   } catch (err) {
-    // Silent error, ale response pošleme
   }
 
   res.json({ response });
 });
 
-// Funkce pro generování AI response
 async function generateResponse(payment) {
   let prompt = `Uživatel: ${payment.userInput}\n\n`;
   if (payment.level === "jemna") {
@@ -148,7 +136,6 @@ async function generateResponse(payment) {
   }
 }
 
-// Automatizace: Cron job každou 1 min kontroluje pending platby
 function checkPayments() {
   let payments;
   try {
@@ -166,7 +153,6 @@ function checkPayments() {
       payment.status = "paid";
       changed = true;
 
-      // Spusť AI
       generateResponse(payment).then(response => {
         payment.response = response;
         payment.status = "completed";
@@ -188,10 +174,8 @@ function checkPayments() {
   }
 }
 
-// Spusť cron (každou minutu)
 cron.schedule("* * * * *", checkPayments);
 
-// Start serveru
 app.listen(PORT, () => {
   console.log("Server běží na portu", PORT);
   checkPayments();  // Inicialní check
